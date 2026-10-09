@@ -153,6 +153,25 @@ dd{margin:0;color:var(--muted);font-size:15px}
 .note-item{display:flex;flex-direction:column;gap:10px;padding-top:20px;border-top:1px solid var(--line)}
 .note-item .a{white-space:pre-wrap;background:var(--surface);border:1px solid var(--line);padding:10px 12px;border-radius:6px}
 .linkbtn{border:0;background:transparent;color:var(--accent);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px;align-self:flex-start}
+
+.tbl{margin:0;display:flex;flex-direction:column;gap:8px}
+.tbl-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbl .ct{font-size:14px;font-weight:600;line-height:1.4}
+.est{font-size:11px;font-weight:600;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:0 6px;letter-spacing:.04em}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.45}
+.tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+.tbl td{font-variant-numeric:tabular-nums}
+.tbl thead th{font-size:12px;color:var(--muted);font-weight:600;background:var(--bg)}
+.tbl tbody th{font-weight:600}
+.tbl tbody tr:last-child th,.tbl tbody tr:last-child td{border-bottom:0}
+.tbl td.wrap,.tbl td:last-child{white-space:normal;min-width:180px}
+.column{display:flex;flex-direction:column;gap:18px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--accent);padding:22px 18px 24px;margin-inline:-4px}
+.col-kicker{font-size:12px;font-weight:600;letter-spacing:.12em;color:var(--accent)}
+.col-title{font-size:clamp(24px,5.6vw,30px);line-height:1.35;letter-spacing:-.02em}
+.col-dek{font-family:var(--display);font-size:17px;line-height:1.6;color:var(--muted);border-left:3px solid var(--line);padding-left:12px}
+.col-h{font-size:17px;letter-spacing:0;color:var(--ink);font-family:var(--display);font-weight:700}
+.column p{line-height:1.85}
 </style>
 </head>
 <body>
@@ -303,6 +322,47 @@ dd{margin:0;color:var(--muted);font-size:15px}
     return out.join('\n');
   }
 
+  /* ---------- 표 · 칼럼 ---------- */
+  function tableEl(t){
+    if (!t || !arr(t.columns).length || !arr(t.rows).length) return null;
+    return h('figure', {class:'tbl'},
+      h('div', {class:'tbl-head'},
+        h('span', {class:'ct', text:str(t.title)}),
+        t.estimate ? h('span', {class:'est', text:'추정'}) : null),
+      h('div', {class:'tbl-scroll'},
+        h('table', null,
+          h('thead', null, h('tr', null, arr(t.columns).map(function(c){ return h('th', {scope:'col', text:str(c)}); }))),
+          h('tbody', null, arr(t.rows).map(function(r){
+            return h('tr', null, arr(r).map(function(c, i){ return i === 0 ? h('th', {scope:'row', text:str(c)}) : h('td', {text:str(c)}); }));
+          }))
+        )
+      ),
+      t.note ? h('figcaption', {class:'src', text:str(t.note)}) : null
+    );
+  }
+  function columnEl(c){
+    var links = arr(c.sources).filter(function(l){ return l && safeUrl(l.url); });
+    return h('article', {class:'column'},
+      h('div', {class:'col-kicker', text:'칼럼' + (c.kicker ? ' · ' + str(c.kicker) : '')}),
+      h('h2', {class:'col-title', text:str(c.title)}),
+      c.dek ? h('p', {class:'col-dek', text:str(c.dek)}) : null,
+      arr(c.sections).map(function(s){
+        return h('section', {class:'stack'},
+          s.heading ? h('h3', {class:'col-h', text:str(s.heading)}) : null,
+          arr(s.body).map(function(p){ return h('p', {text:str(p)}); }),
+          s.chart ? chartEl(s.chart) : null,
+          s.table ? tableEl(s.table) : null);
+      }),
+      links.length ? h('div', {class:'sect'}, h('h3', {text:'이 칼럼의 근거'}),
+        h('ul', {class:'links'}, links.map(function(l){
+          return h('li', {style:'grid-template-columns:1fr'}, h('div', null,
+            h('a', {href:safeUrl(l.url), target:'_blank', rel:'noopener noreferrer', text:str(l.title)}),
+            h('span', {class:'ls', text:str(l.source)})));
+        }))) : null,
+      c.note ? h('p', {class:'src', text:str(c.note)}) : null
+    );
+  }
+
   /* ---------- 한 호 ---------- */
   function storyEl(st, si, id){
     var n = noteState(id), ch = st.chain;
@@ -315,6 +375,7 @@ dd{margin:0;color:var(--muted);font-size:15px}
         return h('div', null, h('span', {class:'fl', text:str(f.label)}), h('span', {class:'fv', text:str(f.value)}), f.note ? h('span', {class:'fn', text:str(f.note)}) : null);
       })) : null,
       st.chart ? chartEl(st.chart) : null,
+      arr(st.tables).map(tableEl),
       ch ? h('div', {class:'sect'},
         h('h3', {text:'여기서 추측할 수 있는 것'}),
         h('div', {class:'chain'},
@@ -404,6 +465,7 @@ dd{margin:0;color:var(--muted);font-size:15px}
         h('span', {class:'hint', text:(iss.marketsNote ? str(iss.marketsNote)+' ' : '')+'빨강은 상승, 파랑은 하락입니다.'})
       ) : null,
       h('div', {class:'stack', style:'gap:36px'}, arr(iss.stories).map(function(st, i){ return storyEl(st, i, id); })),
+      iss.column ? columnEl(iss.column) : null,
       thinkEl(iss, id),
       h('div', {class:'two'},
         iss.term ? h('section', {class:'sect'}, h('h3', {text:'오늘의 용어'}), h('dl', null, h('dt', {text:str(iss.term.term)}), h('dd', {text:str(iss.term.def)}))) : null,

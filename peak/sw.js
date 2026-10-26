@@ -1,5 +1,5 @@
 // 피크 타워 오프라인 캐시. 페이지를 고치면 VERSION을 올립니다.
-const VERSION = 'peak-v1';
+const VERSION = 'peak-v2';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

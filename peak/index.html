@@ -105,12 +105,18 @@ button,input,textarea,select{font:inherit;color:inherit}
 .floor.on .front::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 0%,#ffd39a40,transparent 70%);pointer-events:none}
 .desks{position:absolute;inset:16px 6px 0 6px;display:flex;justify-content:space-around;align-items:flex-end}
 .desk{flex:1;max-width:66px;display:grid;justify-items:center;background:none;border:0;padding:0;cursor:pointer;color:var(--c)}
-.desk svg{width:100%;max-width:56px;height:auto;display:block;overflow:visible}
+.floor.on{height:108px}
+.floor.on .side{height:108px;clip-path:polygon(0 12px,100% 0,100% 96px,0 108px)}
+.desk svg.pix{height:68px;width:auto;display:block;overflow:visible;margin-bottom:-5px;position:relative;z-index:1}
+.desk .tbl{width:84%;max-width:52px;height:4px;background:#ffffffaa;position:relative;z-index:2}
+.ec{opacity:0}
 .desk .who{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--c);margin-top:1px}
-.desk .fig{animation:bob 1.8s ease-in-out infinite;transform-origin:center bottom}
-.desk:nth-child(2) .fig{animation-delay:.3s}.desk:nth-child(3) .fig{animation-delay:.6s}.desk:nth-child(4) .fig{animation-delay:.9s}.desk:nth-child(5) .fig{animation-delay:1.2s}.desk:nth-child(6) .fig{animation-delay:1.5s}
+.desk .bodyg{animation:bob 1.8s steps(2) infinite}
+.desk .eo{animation:eo 4.2s steps(1) infinite}.desk .ec{animation:ec 4.2s steps(1) infinite}
+@keyframes eo{0%,91%{opacity:1}92%,96%{opacity:0}97%{opacity:1}}@keyframes ec{0%,91%{opacity:0}92%,96%{opacity:1}97%{opacity:0}}
+.desk:nth-child(2) *{animation-delay:.7s}.desk:nth-child(3) *{animation-delay:1.4s}.desk:nth-child(4) *{animation-delay:2.1s}.desk:nth-child(5) *{animation-delay:2.8s}.desk:nth-child(6) *{animation-delay:3.5s}
 .desk .scr{animation:flick 3s infinite}
-.desk.idle .fig,.desk.idle .scr{animation:none}
+.desk.idle .bodyg{animation:none}
 .desk .alert{animation:blink 1.2s infinite}
 .base{width:calc(var(--fw) + 120px);max-width:100%;height:26px;margin-top:-4px;border-radius:50%;background:radial-gradient(closest-side,#4c7dff55,#4c7dff22 60%,transparent);position:relative;z-index:0}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
@@ -155,7 +161,8 @@ section.blk{display:grid;gap:14px;scroll-margin-top:16px}
 .agent.flash{box-shadow:0 0 0 2px var(--c)}
 .ahead{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center}
 .avatar{width:44px;height:44px;border-radius:10px;background:#ffffff0a;border:1px solid var(--line);display:grid;place-items:center;color:var(--c)}
-.avatar svg{width:34px;height:34px}
+.avatar{overflow:hidden}.avatar svg.pix{height:58px;width:auto;margin-top:16px}
+.avatar .eo{animation:eo 4.2s steps(1) infinite}.avatar .ec{animation:ec 4.2s steps(1) infinite}
 .ahead h3{font-size:17px;line-height:1.2}
 .ahead small{display:block;font-size:12px;color:var(--muted)}
 .state{font-family:var(--mono);font-size:10.5px;padding:1px 7px;border-radius:4px;border:1px solid currentColor;white-space:nowrap}
@@ -223,6 +230,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 
 @media (max-width:1060px){.stage{grid-template-columns:1fr}.log{max-height:620px}.tools{grid-template-columns:1fr}}
 @media (max-width:720px){
+  .desk svg.pix{height:56px}
   body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   .tabbar{display:flex}
   .top{padding-block:14px 0}
@@ -232,7 +240,7 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   .desk .who{font-size:7.5px}
   .vacsign{right:8px}.door{display:none}
 }
-@media (prefers-reduced-motion:reduce){.desk .fig,.desk .scr,.desk .alert,.antenna::before{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.desk .bodyg,.eo,.ec,.alert,.antenna::before{animation:none!important}}
 </style>
 
 <div class="wrap">
@@ -364,7 +372,7 @@ var now=new Date();var TODAY=new Date(now.getFullYear(),now.getMonth(),now.getDa
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 /* ---------- 계획표 (사용자 일정표에서 가져옴) ---------- */
-var PROFILE='172cm, 시작 73kg, 무대 목표 70.5~71kg. 단백질 165g·지방 50g 고정. 쌀밥(익힌 것) 근무일 950g/휴무일 850g 기본, 매주 월요일 7일 평균 판정으로 ±100g. 평일 물류센터 근무 7시간 + 하루 1만 보. 주말 휴무. 11/23~11/27 연차. 펌핑 도구: 밴드 1개, 7kg 덤벨 2개. 고강도 인터벌 없음. 물·소금 매일 같은 양, 물·소금 끊기와 이뇨제 금지.';
+var PROFILE='172cm, 시작 73kg, 무대 목표 70.5~71kg. 단백질 165g·지방 50g 고정. 쌀밥(익힌 것) 10/26부터 근무일·휴무일 모두 850g 고정, 다음 월요일부터 7일 평균 판정으로 ±100g. 평일 물류센터 근무 7시간 + 하루 1만 보. 주말 휴무. 11/23~11/27 연차. 펌핑 도구: 밴드 1개, 7kg 덤벨 2개. 고강도 인터벌 없음. 물·소금 매일 같은 양, 물·소금 끊기와 이뇨제 금지.';
 var REFEED={'2026-10-31':1,'2026-11-14':1};
 var COND={'2026-11-07':1,'2026-11-21':1};
 var EXCLUDE={'2026-11-01':1,'2026-11-15':1};
@@ -388,7 +396,7 @@ var EXTRA={
  '2026-10-31':[['식단','테스트 리피드 1차: 쌀밥 1.4~1.5kg, 단백질 140~150g, 지방 30~35g'],['운동','가장 무거운 운동(하체 또는 등)과 겹치기'],['식단','물·소금은 평소 그대로']],
  '2026-11-01':[['체크','리피드 다음 날: 아침·오후 사진(앞·옆·뒤). 체중은 평균에서 제외'],['체크','사진 판정실에 올려 리피드 반응 판정 받기']],
  '2026-11-02':[['포징','이번 주부터 대회 트렁크 입고 연습']],
- '2026-11-07':[['식단','조건부 리피드: 신호 2개 이상일 때만, 아니면 휴무일 식단']],
+ '2026-11-07':[['식단','조건부 리피드: 신호 2개 이상일 때만, 아니면 평소 식단']],
  '2026-11-08':[['체크','컨디션 판정: 허리 하부·하복부 선 확인 → 무대 체중 71 vs 70.5 결정'],['포징','펌핑 루틴 1차 리허설 (타이머로 20분 재기)']],
  '2026-11-13':[['준비','내일 리피드용 쌀밥 준비']],
  '2026-11-14':[['식단','테스트 리피드 2차: 1차 결과 반영해 양 조절'],['운동','하체 또는 등 고강도와 겹치기']],
@@ -399,9 +407,9 @@ var EXTRA={
  '2026-11-22':[['포징','펌핑 루틴 2차 리허설 + 풀루틴'],['준비','준비물 1차 짐 싸기, 대회장 이동 경로·시간 확인'],['체크','감량 마감 체크: 70.5~71kg 근처인지. 피크 위크엔 살 빼기 시도 안 함']]
 };
 function peakFor(n){
-  var off=rice(true),best=S.state.bestRefeed;
+  var off=rice(),best=S.state.bestRefeed;
   var P={
-   5:[['식단','쌀밥 '+off+'g (일을 안 하니 평소보다 100g 적게) · 단백질 165g · 지방 50g'],['운동','상체 중간 강도'],['포징','풀루틴 3회 + 영상 촬영'],['체크','걸음 8천~1만 보 (산책으로 활동량 유지)']],
+   5:[['식단','쌀밥 '+off+'g (평소와 같은 양) · 단백질 165g · 지방 50g'],['운동','상체 중간 강도'],['포징','풀루틴 3회 + 영상 촬영'],['체크','걸음 8천~1만 보 (산책으로 활동량 유지)']],
    4:[['식단','쌀밥 '+off+'g · 단백질 165g · 지방 50g'],['운동','전신 가볍게, 고반복 펌핑 위주 (하체는 가볍게)'],['포징','풀루틴 3회'],['체크','걸음 8천~1만 보']],
    3:[['식단','쌀밥 '+off+'g. 저녁부터 채소·콩·현미 등 섬유질 줄이기'],['운동','마지막 웨이트: 가벼운 전신 펌핑 (하체 제외)'],['준비','체모 제모 (대회 아침 태닝 3일 전)'],['포징','풀루틴 1~2회 + 영상 촬영']],
    2:[['식단','카보로딩 1일차: '+(best?'쌀밥 '+best+'g (테스트 리피드 최적량)':'테스트 리피드에서 가장 좋았던 쌀밥 양')+' · 단백질 140~150g · 지방 30~35g'],['식단','물·소금 평소 그대로, 섬유질 낮게'],['운동','휴식, 걷기만'],['포징','펌핑 루틴 3차 리허설 + 포징 30분 (쥐 안 나게)']],
@@ -462,8 +470,10 @@ function addFeed(agent,title,body){
 }
 
 /* ---------- 계산 ---------- */
-function riceAdj(){var s=0,j=S.state.judged||{};for(var k in j)s+=(+j[k].delta||0);return s}
-function rice(off){return (off?850:950)+riceAdj()}
+// 10/26부터 쌀밥 850g 고정. 그 이전 판정은 이 기준에 이미 반영된 것으로 봅니다.
+var RICE_BASE=850,RICE_FROM='2026-10-26';
+function riceAdj(){var s=0,j=S.state.judged||{};for(var k in j)if(k>RICE_FROM)s+=(+j[k].delta||0);return s}
+function rice(){return RICE_BASE+riceAdj()}
 function kcal(r,p,f){return Math.round(r*1.284+p*4+f*9)}
 function isOff(d){var w=d.getDay();return w===0||w===6||within(d,D(11,23),D(11,27))}
 function itemsFor(d){
@@ -471,7 +481,7 @@ function itemsFor(d){
   if(n<0||d<START)return [];
   if(n<=5){items=peakFor(n);var ex0=EXTRA[k];return ex0?items.concat(ex0):items}
   var ref=!!REFEED[k];
-  if(!ref)items.push(['식단',off?'쌀밥 '+rice(true)+'g (휴무일) · 단백질 165g · 지방 50g':'쌀밥 '+rice(false)+'g · 단백질 165g · 지방 50g']);
+  if(!ref)items.push(['식단','쌀밥 '+rice()+'g · 단백질 165g · 지방 50g']);
   var f=focusFor(d),ft=f?f[2]+': '+f[3]:'';
   if(within(d,D(10,16),D(10,25))){items.push(['포징','포징 30분: 포즈별 30초 × 3 · '+ft]);items.push(['포징','공복 베큠 20초 × 5'])}
   else if(within(d,D(10,26),D(11,8))){items.push(['포징','포징 40분: 포즈별 45~60초 버티기 + 풀루틴 2회 · '+ft]);items.push(['포징','공복 베큠 30초 × 5'])}
@@ -511,12 +521,136 @@ function nextPrep(limit){
 function packProgress(){var t=0,c=0,p=S.state.pack||{};PACK.forEach(function(g,gi){g[1].forEach(function(_,i){t++;if(p[gi+'-'+i])c++})});return [c,t]}
 
 /* ---------- 그림 ---------- */
-function figSVG(state){
-  var alert=state==='warn'?'<circle class="alert" cx="30" cy="6" r="3" fill="var(--warn)"/>':'';
-  return '<svg viewBox="0 0 44 46" aria-hidden="true">'+
-   '<rect class="scr" x="25" y="20" width="15" height="11" rx="1.5" fill="currentColor" opacity=".85"/><rect x="31" y="31" width="3" height="4" fill="#ffffff55"/>'+
-   '<g class="fig"><circle cx="13" cy="14" r="5" fill="#f4efe6"/><rect x="7" y="20" width="12" height="15" rx="4" fill="#f4efe6"/><rect x="7" y="20" width="12" height="4" rx="2" fill="currentColor"/></g>'+
-   '<rect x="1" y="35" width="42" height="3" rx="1" fill="#ffffffaa"/><rect x="4" y="38" width="2" height="8" fill="#ffffff55"/><rect x="38" y="38" width="2" height="8" fill="#ffffff55"/>'+alert+'</svg>';
+var PIX=(function(){
+var W=24,H=31;
+var BLINK=false,OUT='#3b2448',SK='#ffd9bd',SKS='#efb894',BR='#c98250',BRS='#a05f33',EYE='#2a1e3a',BL='#ff9db0',WH='#ffffff';
+function sprite(paint){
+  var g=[];for(var y=0;y<H;y++){g.push(new Array(W).fill(null))}
+  var api={
+    p:function(x,y,c){if(x>=0&&x<W&&y>=0&&y<H)g[y][x]=c},
+    r:function(x,y,w,h,c){for(var j=0;j<h;j++)for(var i=0;i<w;i++)api.p(x+i,y+j,c)},
+    clr:function(x,y){if(x>=0&&x<W&&y>=0&&y<H)g[y][x]=null}
+  };
+  paint(api);
+  // 외곽선
+  var o=g.map(function(r){return r.slice()});
+  for(var y=0;y<H;y++)for(var x=0;x<W;x++){if(g[y][x])continue;
+    var n=[[1,0],[-1,0],[0,1],[0,-1]].some(function(d){var X=x+d[0],Y=y+d[1];return X>=0&&X<W&&Y>=0&&Y<H&&g[Y][X]&&g[Y][X]!=='#0000'});
+    if(n)o[y][x]=OUT}
+  var s='';
+  for(var y2=0;y2<H;y2++){var x2=0;while(x2<W){var c=o[y2][x2];if(!c||c==='#0000'){x2++;continue}var st=x2;while(x2<W&&o[y2][x2]===c)x2++;s+='<rect x="'+st+'" y="'+y2+'" width="'+(x2-st)+'" height="1" fill="'+c+'"/>'}}
+  return s;
+}
+function svg(inner,cls,label){return '<svg class="'+(cls||'')+'" viewBox="-1 -1 '+(W+2)+' '+(H+2)+'" shape-rendering="crispEdges" role="img" aria-label="'+(label||'')+'">'+inner+'</svg>'}
+
+// 공통 부품
+function head(a,skin){skin=skin||SK;a.r(7,5,10,9,skin);a.clr(7,5);a.clr(16,5);a.clr(7,13);a.clr(16,13)}
+function eyes(a,o){o=o||{};
+  if(BLINK){a.r(9,10,2,1,EYE);a.r(13,10,2,1,EYE);a.p(8,9,EYE);a.p(15,9,EYE)}
+  else{
+    a.r(9,8,2,3,EYE);a.r(13,8,2,3,EYE);
+    a.p(9,8,WH);a.p(13,8,WH);a.p(10,10,'#9d86d6');a.p(14,10,'#9d86d6');
+    if(o.lash){a.p(8,8,EYE);a.p(15,8,EYE)}
+  }
+  a.r(7,11,2,1,BL);a.r(15,11,2,1,BL);
+  if(o.mouth==='o'){a.r(11,12,2,2,'#e0607e');a.p(11,12,'#ff9db0')}
+  else if(o.mouth==='flat'){a.r(11,12,2,1,'#b04a66')}
+  else {a.p(10,12,'#c84a68');a.p(11,13,'#c84a68');a.p(12,13,'#c84a68');a.p(13,12,'#c84a68')}
+  if(o.brow){a.p(9,7,EYE);a.p(10,7,EYE);a.p(13,7,EYE);a.p(14,7,EYE)}
+}
+function neck(a,c){a.r(11,14,2,1,c||SKS)}
+function body(a,shirt){a.r(8,15,8,6,shirt)}
+function armsDown(a,sleeve,skin){skin=skin||SK;a.r(6,15,2,3,sleeve);a.r(16,15,2,3,sleeve);a.r(6,18,2,2,skin);a.r(16,18,2,2,skin)}
+function skirt(a,c){a.r(8,21,8,2,c);a.p(7,22,c);a.p(16,22,c)}
+function shorts(a,c){a.r(8,21,8,2,c)}
+function legs(a,skin,shoe,sock){skin=skin||SK;a.r(9,23,2,4,skin);a.r(13,23,2,4,skin);if(sock){a.r(9,26,2,1,sock);a.r(13,26,2,1,sock)}a.r(8,27,3,1,shoe);a.r(13,27,3,1,shoe)}
+function base(a,c,c2){a.r(4,29,16,1,c);a.r(5,28,14,1,c2)}
+
+var C={};
+// 헤드코치: 하이 포니테일, 검정 티, 팔짱, 호루라기, 진지한 눈썹
+C.COACH=function(a){
+  var HA='#2b2440',HA2='#40375e';
+  base(a,'#7a4f2b','#a8713f');
+  a.r(17,3,3,2,HA);a.r(18,5,3,5,HA);a.r(19,10,2,3,HA);a.p(19,13,HA);a.p(17,3,'#e3a468');a.p(17,4,'#e3a468');
+  head(a);a.r(7,4,10,3,HA);a.r(6,5,1,6,HA);a.r(17,5,1,5,HA);a.r(7,7,2,1,HA);a.r(12,7,1,1,HA);a.p(15,7,HA);a.p(16,7,HA);a.r(9,3,6,1,HA);a.p(10,4,HA2);a.p(11,4,HA2);
+  eyes(a,{brow:true,mouth:'flat'});neck(a);
+  body(a,'#1f1d29');a.r(9,16,6,1,'#e3a468');
+  a.r(6,15,2,2,'#1f1d29');a.r(16,15,2,2,'#1f1d29');a.r(6,17,12,2,SK);a.p(11,17,SKS);a.p(12,18,SKS);
+  a.p(11,15,'#cfd5e0');a.p(12,16,'#9aa3b5');
+  shorts(a,'#2b3150');legs(a,SK,'#ffffff','#ffffff');
+};
+// 영양 담당: 단발, 초록 머리띠, 앞치마, 밥그릇
+C.NUTRI=function(a){
+  var HA='#7a4a2c',HA2='#9a6240';
+  base(a,'#1f6a45','#3aa36d');
+  head(a);a.r(7,4,10,3,HA);a.r(9,3,6,1,HA);a.r(6,5,1,8,HA);a.r(17,5,1,8,HA);a.r(7,7,1,6,HA);a.r(16,7,1,6,HA);a.r(8,7,2,1,HA);a.r(14,7,2,1,HA);a.p(11,7,HA);a.p(12,4,HA2);a.p(13,4,HA2);
+  a.r(7,4,10,1,'#5fd39a');a.p(8,3,'#5fd39a');a.p(15,3,'#5fd39a');
+  eyes(a,{lash:true});neck(a);
+  body(a,'#fff4e8');a.r(9,16,6,5,'#5fd39a');a.p(9,15,'#5fd39a');a.p(14,15,'#5fd39a');a.r(10,19,4,1,'#3fae78');
+  a.r(6,15,2,3,'#fff4e8');a.r(16,15,2,3,'#fff4e8');
+  a.r(8,17,8,1,WH);a.r(9,18,6,1,WH);a.r(10,19,4,1,'#dfe4ec');a.r(9,16,6,1,'#fffbe8');a.r(10,15,4,1,'#fffbe8');
+  a.p(7,17,SK);a.p(16,17,SK);
+  a.p(15,14,'#b07a45');a.p(16,13,'#b07a45');a.p(17,12,'#b07a45');
+  skirt(a,'#3b3f5c');legs(a,SK,'#8a5a3c');
+};
+// 트레이닝 담당: 양갈래 번, 헤어밴드, 탱크톱, 바벨
+C.TRAIN=function(a){
+  var HA='#ff7a59',HA2='#ffa082';
+  base(a,'#7a2e19','#c4502e');
+  a.r(0,14,24,1,'#a7b0c2');a.r(0,11,2,7,'#384057');a.r(22,11,2,7,'#384057');a.r(2,12,1,5,'#525c78');a.r(21,12,1,5,'#525c78');
+  a.r(5,2,3,3,HA);a.r(16,2,3,3,HA);a.p(6,2,HA2);a.p(17,2,HA2);
+  head(a);a.r(7,4,10,3,HA);a.r(9,3,6,1,HA);a.r(6,5,1,5,HA);a.r(17,5,1,5,HA);a.r(7,7,1,2,HA);a.r(16,7,1,2,HA);a.r(9,7,2,1,HA);a.p(13,7,HA);a.p(11,4,HA2);
+  a.r(7,6,10,1,'#ffffff');
+  eyes(a,{mouth:'o'});neck(a);
+  body(a,'#ff8a5c');a.r(8,15,1,2,SK);a.r(15,15,1,2,SK);a.r(10,15,4,1,SK);
+  a.r(6,12,2,4,SK);a.r(16,12,2,4,SK);a.r(6,13,2,2,SK);a.r(16,13,2,2,SK);a.p(6,14,SKS);a.p(17,14,SKS);
+  shorts(a,'#2b3150');a.p(8,22,'#ff8a5c');a.p(15,22,'#ff8a5c');legs(a,SK,'#ff8a5c','#ffffff');
+};
+// 포징 코치: 긴 웨이브 머리, 브론즈 피부, 포징복, 더블 바이셉스
+C.POSE=function(a){
+  var HA='#3a2238',HA2='#5a3456',SUIT='#a26bf0';
+  base(a,'#3f2a63','#6b49a3');
+  a.r(5,5,2,10,HA);a.r(17,5,2,10,HA);a.p(4,8,HA);a.p(19,9,HA);a.p(4,12,HA);a.p(19,13,HA);
+  head(a,BR);a.r(7,4,10,3,HA);a.r(9,3,6,1,HA);a.r(7,7,1,4,HA);a.r(16,7,1,4,HA);a.r(8,7,3,1,HA);a.r(14,7,2,1,HA);a.p(10,4,HA2);a.p(11,3,HA2);
+  a.p(16,4,'#ff9db0');a.p(17,3,'#ff9db0');a.p(17,4,'#ffd0dc');
+  eyes(a,{lash:true,mouth:'o'});neck(a,BRS);
+  a.r(8,15,8,6,BR);a.r(9,15,6,2,SUIT);a.p(11,16,BR);a.p(12,16,BR);a.r(11,18,2,1,BRS);a.r(11,19,2,1,BRS);a.r(9,20,6,2,SUIT);a.r(8,21,8,1,SUIT);
+  a.r(3,15,5,2,BR);a.r(16,15,5,2,BR);a.r(3,11,2,4,BR);a.r(19,11,2,4,BR);a.r(3,10,2,2,BRS);a.r(19,10,2,2,BRS);a.p(5,14,BRS);a.p(18,14,BRS);
+  a.r(9,22,2,5,BR);a.r(13,22,2,5,BR);a.r(8,27,3,1,'#c39cff');a.r(13,27,3,1,'#c39cff');
+  a.p(21,6,'#ffe9a8');a.p(20,7,'#ffe9a8');a.p(22,7,'#ffe9a8');a.p(21,8,'#ffe9a8');
+};
+// 컨디션 분석: 긴 생머리 + 옆 땋은 머리, 안경, 하늘색 후드티, 태블릿
+C.SCAN=function(a){
+  var HA='#3b2a24',HA2='#5a4036';
+  base(a,'#1d4a6a','#2f78ad');
+  a.r(5,5,2,12,HA);a.r(17,5,2,8,HA);a.p(5,17,HA);a.p(6,18,'#7cc4ff');
+  head(a);a.r(7,4,10,3,HA);a.r(9,3,6,1,HA);a.r(7,7,1,5,HA);a.r(16,7,1,5,HA);a.r(8,7,1,1,HA);a.r(10,7,4,1,HA);a.p(12,4,HA2);a.p(13,4,HA2);
+  eyes(a,{});
+  var GL='#c9d3ee';a.r(9,7,2,1,GL);a.r(13,7,2,1,GL);a.r(8,8,1,3,GL);a.r(11,8,1,3,GL);a.r(12,8,1,3,GL);a.r(15,8,1,3,GL);a.r(9,11,2,1,GL);a.r(13,11,2,1,GL);
+  neck(a);
+  a.r(7,14,10,1,'#4f9fd8');body(a,'#7cc4ff');a.p(10,16,WH);a.p(10,17,WH);a.p(13,16,WH);a.p(13,17,WH);a.r(9,19,6,1,'#5aaee8');
+  a.r(6,15,2,4,'#7cc4ff');a.r(6,19,2,1,SK);a.r(16,15,2,2,'#7cc4ff');
+  a.r(14,16,7,5,'#141b30');a.r(15,17,5,3,'#1f2a48');a.p(15,19,'#7cc4ff');a.p(16,18,'#7cc4ff');a.p(17,19,'#7cc4ff');a.p(18,18,'#7cc4ff');a.p(19,17,'#e3a468');a.p(14,18,SK);a.p(14,19,SK);
+  skirt(a,'#2c3350');legs(a,SK,'#e9edf5','#ffffff');
+};
+// 대회 매니저: 노란 모자 + 짧은 머리, 클립보드, 번호표
+C.OPS=function(a){
+  var HA='#2b2440',CAP='#f0d06a',CAP2='#c9a83f';
+  base(a,'#6a5414','#b0902a');
+  head(a);a.r(6,6,1,6,HA);a.r(17,6,1,6,HA);a.r(7,7,1,3,HA);a.r(16,7,1,3,HA);a.p(17,12,HA);a.p(6,12,HA);
+  a.r(7,2,10,4,CAP);a.r(9,1,6,1,CAP);a.r(5,6,14,1,CAP2);a.p(12,3,'#ffffff');a.p(11,4,'#ffffff');a.p(13,4,'#ffffff');a.p(12,4,'#ffffff');a.p(8,3,'#fff3c4');
+  a.r(8,7,2,1,HA);a.r(14,7,2,1,HA);
+  eyes(a,{lash:true});neck(a);
+  body(a,CAP);a.r(10,15,4,1,'#fff3c4');a.r(10,17,4,3,WH);a.p(11,18,'#1a1d2b');a.p(12,18,'#1a1d2b');
+  a.r(16,15,2,3,CAP);a.r(16,18,2,2,SK);a.r(6,15,2,2,CAP);
+  a.r(2,15,5,7,'#8a5a33');a.r(3,16,3,5,'#fbfaf6');a.r(3,14,3,1,'#c9ced8');a.p(3,17,'#2c7a4b');a.p(4,18,'#2c7a4b');a.p(5,17,'#9aa3b5');a.p(3,19,'#9aa3b5');a.p(4,19,'#9aa3b5');a.p(5,19,'#9aa3b5');a.p(7,17,SK);
+  skirt(a,'#2c3148');legs(a,SK,CAP,'#ffffff');
+};
+
+var art={};ORDER.forEach(function(a){BLINK=false;var o=sprite(C[a]);BLINK=true;var c=sprite(C[a]);BLINK=false;art[a]={o:o,c:c,vb:'-1 -1 '+(W+2)+' '+(H+2)}});return art})();
+function figSVG(state,a){
+  var P=PIX[a],alert=state==='warn'?'<g class="alert"><rect x="17" y="-1" width="5" height="5" fill="#ff5a5a"/><rect x="19" y="0" width="1" height="2" fill="#fff"/><rect x="19" y="3" width="1" height="1" fill="#fff"/></g>':'';
+  return '<svg class="pix" viewBox="'+P.vb+'" shape-rendering="crispEdges" aria-hidden="true"><g class="bodyg"><g class="eo">'+P.o+'</g><g class="ec">'+P.c+'</g></g>'+alert+'</svg>';
 }
 function agentState(a){
   var k=key(TODAY),items=todayItems(),c=day(k).checks||{};
@@ -538,7 +672,7 @@ function renderTower(){
       '<span class="lamp" style="left:'+(14+f*9)+'%"></span><span class="lamp" style="left:'+(52+f*4)+'%"></span><span class="door"></span>'+
       '<span class="vacsign"><b>VACANT</b><small>임대 문의 · 관리실</small></span></div><div class="side"></div></div></div></div>';
   });
-  var desks=ORDER.map(function(a){var st=agentState(a);return '<button type="button" class="desk'+(st==='wait'?' idle':'')+'" style="--c:'+col(a)+'" data-agent="'+a+'" aria-label="'+AG[a].name+'">'+figSVG(st)+'<span class="who">'+a+'</span></button>'}).join('');
+  var desks=ORDER.map(function(a){var st=agentState(a);return '<button type="button" class="desk'+(st==='wait'?' idle':'')+'" style="--c:'+col(a)+'" data-agent="'+a+'" aria-label="'+AG[a].name+'">'+figSVG(st,a)+'<span class="tbl"></span><span class="who">'+a+'</span></button>'}).join('');
   h+='<div class="row"><div class="lab"><b>1F · 클래식 피지크팀</b><small>에이전트 6명 · '+(phaseOf(TODAY)?phaseOf(TODAY).name:'대기')+'</small><span class="st"><span class="dot"></span>가동중'+(lf?' · 마지막 보고 '+lf:'')+'</span></div>'+
     '<div class="floorWrap"><div class="slab"></div><div class="floor on"><div class="front"><span class="tag">1F</span><div class="desks">'+desks+'</div></div><div class="side"></div></div><div class="slab"></div></div></div>';
   document.getElementById('tower').innerHTML=h;
@@ -597,11 +731,11 @@ function report(a){
       (alerts.length?'<div class="callout warn">'+alerts.join('<br>')+'</div>':'<div class="callout good">걸리는 게 없습니다. 오늘 업무만 끝내면 됩니다.</div>');
   }
   if(a==='NUTRI'){
-    var off=isOff(TODAY),ref=!!REFEED[k],r=n<=5&&n>=3?rice(true):rice(off),h='';
+    var off=isOff(TODAY),ref=!!REFEED[k],r=rice(),h='';
     if(ref)h+='<div class="callout">오늘은 테스트 리피드입니다. 쌀밥 1.4~1.5kg · 단백질 140~150g · 지방 30~35g. 늘린 밥은 운동 전후에 몰아서.</div>';
     else if(n>=3){var meal=Math.round(r/5/10)*10;
       h+='<div class="kv"><div><span>쌀밥</span><b>'+r+'g</b></div><div><span>단백질</span><b>165g</b></div><div><span>지방</span><b>50g</b></div><div><span>열량</span><b>~'+kcal(r,165,50).toLocaleString()+'</b></div></div>'+
-        '<p class="note">5끼 기준 한 끼 쌀밥 약 '+meal+'g + 단백질 33g. 줄일 땐 운동과 가장 먼 끼니부터. 누적 조정 '+(riceAdj()>0?'+':'')+riceAdj()+'g.</p>';}
+        '<p class="note">5끼 기준 한 끼 쌀밥 약 '+meal+'g + 단백질 33g. 줄일 땐 운동과 가장 먼 끼니부터. 10/26부터 매일 850g 고정, 이후 조정 '+(riceAdj()>0?'+':'')+riceAdj()+'g.</p>';}
     var wk=weekly();
     if(wk.j){h+='<div class="callout '+(wk.j.tone)+'">'+mdw(wk.m)+' 판정 · 7일 평균 '+wk.a.toFixed(2)+' → 직전 '+wk.p.toFixed(2)+'kg ('+(wk.dl>0?'+':'')+wk.dl.toFixed(2)+'kg)<br><b>'+wk.j.label+'</b>: '+wk.j.msg+'</div>';
       if(wk.applied)h+='<p class="note">이번 주 판정 적용 완료 ('+(wk.applied.delta>0?'+':'')+wk.applied.delta+'g).</p>';
@@ -609,7 +743,7 @@ function report(a){
     else if(wk.missing)h+='<p class="note">이번 주 판정을 하려면 이번 주와 지난주 각각 4일 이상 체중이 필요합니다. 분석실에서 지난 기록을 한꺼번에 넣을 수 있습니다.</p>';
     if(COND[k]){var sg=day(k).signals||{},cnt=SIGNALS.filter(function(_,i){return sg[i]}).length;
       h+='<div class="sig"><b style="font-size:13px">조건부 리피드 신호 ('+cnt+'/4)</b>'+SIGNALS.map(function(t,i){return '<label><input type="checkbox" data-sig="'+i+'"'+(sg[i]?' checked':'')+'><span>'+t+'</span></label>'}).join('')+
-        '<div class="callout '+(cnt>=2?'':'good')+'">'+(cnt>=2?'신호 2개 이상: 오늘 리피드 진행 (쌀밥 1.4~1.5kg, 무거운 운동과 겹치기).':'신호 2개 미만: 휴무일 식단으로 갑니다.')+'</div></div>';}
+        '<div class="callout '+(cnt>=2?'':'good')+'">'+(cnt>=2?'신호 2개 이상: 오늘 리피드 진행 (쌀밥 1.4~1.5kg, 무거운 운동과 겹치기).':'신호 2개 미만: 평소 식단(쌀밥 '+rice()+'g)으로 갑니다.')+'</div></div>';}
     if(TODAY>=D(11,1)&&n>=2)h+='<div class="row2"><label class="note" for="bestR">테스트 리피드 최적 쌀밥 양</label><input class="inp w" id="bestR" inputmode="numeric" placeholder="g" value="'+(S.state.bestRefeed||'')+'"></div>';
     if(mine.length&&!ref)h+=li(mine.slice(n<=5?0:1));
     return h;
@@ -649,7 +783,7 @@ var aiAvail=false;
 function renderAgents(){
   var h='';
   ORDER.forEach(function(a){var st=agentState(a);
-    h+='<article class="agent" id="ag-'+a+'" style="--c:'+col(a)+'"><div class="ahead"><div class="avatar">'+figSVG(st)+'</div><div><h3>'+AG[a].name+'</h3><small>'+a+' · '+AG[a].role+'</small></div><span class="state '+st+'">'+(st==='work'?'근무중':st==='warn'?'확인 필요':'대기')+'</span></div>'+
+    h+='<article class="agent" id="ag-'+a+'" style="--c:'+col(a)+'"><div class="ahead"><div class="avatar">'+figSVG(st,a)+'</div><div><h3>'+AG[a].name+'</h3><small>'+a+' · '+AG[a].role+'</small></div><span class="state '+st+'">'+(st==='work'?'근무중':st==='warn'?'확인 필요':'대기')+'</span></div>'+
       '<div class="rep">'+report(a)+'</div>'+
       '<div class="ai"'+(aiAvail?'':' hidden')+'><div class="row2"><button type="button" class="btn" data-ai="'+a+'"'+(aiBusy[a]?' disabled':'')+'>'+(aiBusy[a]?'보고서 작성 중…':'AI 보고 받기')+'</button></div><div class="aiOut" id="ai-'+a+'">'+(aiOut[a]?md2html(aiOut[a]):'')+'</div></div></article>';
   });
@@ -710,7 +844,7 @@ document.addEventListener('click',function(e){
   else if(el.dataset.agent){var card=document.getElementById('ag-'+el.dataset.agent);if(card){card.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'});card.classList.add('flash');setTimeout(function(){card.classList.remove('flash')},1400)}}
   else if(el.dataset.floor){toast(el.dataset.floor+'F는 공실입니다. 입주할 팀이 정해지면 Claude에게 요청하세요.')}
   else if(el.dataset.apply){var j=Object.assign({},S.state.judged||{});j[el.dataset.apply]={delta:+el.dataset.delta,at:new Date().toISOString()};setState({judged:j});
-    addFeed('NUTRI',+el.dataset.delta===0?'주간 판정: 쌀밥 유지':'주간 판정: 쌀밥 '+(+el.dataset.delta>0?'+':'−')+Math.abs(+el.dataset.delta)+'g 적용','근무일 '+rice(false)+'g · 휴무일 '+rice(true)+'g')}
+    addFeed('NUTRI',+el.dataset.delta===0?'주간 판정: 쌀밥 유지':'주간 판정: 쌀밥 '+(+el.dataset.delta>0?'+':'−')+Math.abs(+el.dataset.delta)+'g 적용','매일 쌀밥 '+rice()+'g')}
   else if(el.dataset.ai){askAgent(el.dataset.ai)}
 });
 document.addEventListener('keydown',function(e){var el=e.target.closest&&e.target.closest('[data-floor]');if(el&&(e.key==='Enter'||e.key===' ')){e.preventDefault();el.click()}});
@@ -744,7 +878,7 @@ function ctx(){
   var wk=weekly(),f=focusFor(TODAY);
   return '[선수 프로필] '+PROFILE+'\n[대회] WNGP 클래식 피지크 비기너, 2026-11-28(토). 오늘 '+key(TODAY)+'('+DOW[TODAY.getDay()]+'), '+dlabel(n)+', 단계: '+(ph?ph.name+' — '+ph.desc:'없음')+
    '\n[오늘 업무] '+todayItems().map(function(it,i){return (c[i]?'[완료] ':'[ ] ')+it[0]+': '+it[1]}).join(' / ')+
-   '\n[현재 쌀밥] 근무일 '+rice(false)+'g, 휴무일 '+rice(true)+'g (누적 조정 '+riceAdj()+'g). 테스트 리피드 10/31, 11/14. 조건부 11/7, 11/21. 마지막 고강도 하체 11/21.'+
+   '\n[현재 쌀밥] 근무일·휴무일 모두 '+rice()+'g 고정 (10/26 이후 누적 조정 '+riceAdj()+'g). 테스트 리피드 10/31, 11/14. 조건부 11/7, 11/21. 마지막 고강도 하체 11/21.'+
    '\n[체중 기록 최근 3주] '+(ws.join(', ')||'없음')+' / 7일 평균 '+(avg7(TODAY,0)?avg7(TODAY,0).toFixed(2):'부족')+', 그 전 7일 '+(avg7(TODAY,7)?avg7(TODAY,7).toFixed(2):'부족')+
    (wk.j?' / 이번 주 판정: '+wk.j.label+(wk.applied?' (적용됨)':' (미적용)'):'')+
    '\n[포징 이번 주 포커스] '+(f?f[2]+': '+f[3]+' / 고칠 점: '+f[4]:'없음')+

@@ -191,6 +191,18 @@ dd{margin:0;color:var(--muted);font-size:15px}
 .g-val{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums;line-height:1.3}
 .g-basis{font-size:12px;color:var(--muted);line-height:1.5}
 .g-read{margin:0;font-size:15px;line-height:1.7}
+
+.lens-hist{border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:10px}
+.lens-hist-h{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.04em}
+.radar{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.radar li{display:flex;flex-direction:column;gap:4px;padding:12px 0 12px 16px;border-left:2px solid var(--accent);position:relative}
+.radar li+li{border-top:1px solid var(--line)}
+.radar li::before{content:"";position:absolute;left:-6px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.r-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.r-top strong{font-family:var(--display);font-size:17px;line-height:1.45}
+.r-since{font-size:12px;color:var(--muted)}
+.radar p{margin:0;font-size:15px;line-height:1.7}
+.r-imp{color:var(--accent);font-weight:500}
 </style>
 </head>
 <body>
@@ -366,10 +378,29 @@ dd{margin:0;color:var(--muted);font-size:15px}
           it.view ? h('div', {class:'view'},
             h('div', {class:'view-h'}, h('span', {text:'머니레터의 시각'}), it.controversial ? h('span', {class:'hot', text:'논쟁적'}) : null),
             h('p', {text:str(it.view)})) : null,
+          it.history ? h('div', {class:'lens-hist'},
+            h('div', {class:'lens-hist-h', text:str(it.history.title) || '과거에는 어땠나'}),
+            arr(it.history.body).map(paraEl),
+            it.history.chart ? chartEl(it.history.chart) : null,
+            it.history.table ? tableEl(it.history.table) : null) : null,
           it.check ? h('div', {class:'lens-row'}, h('span', {class:'lens-k', text:'확인할 것'}), h('p', {text:str(it.check)})) : null
         );
       }))
     );
+  }
+  function radarEl(R){
+    var items = arr(R && R.items ? R.items : R);
+    if (!items.length) return null;
+    return h('section', {class:'sect'},
+      h('h2', {text:(R && R.title) ? str(R.title) : '특이점 레이더'}),
+      h('p', {class:'hint', style:'font-size:14px', text:(R && R.intro) ? str(R.intro) : '아직 큰 뉴스는 아니지만 흐름이 바뀌는 조짐으로 보이는 신호입니다.'}),
+      h('ul', {class:'radar'}, items.map(function(it){
+        return h('li', null,
+          h('div', {class:'r-top'}, h('strong', {text:str(it.signal)}), it.controversial ? h('span', {class:'hot', text:'논쟁적'}) : null),
+          it.since ? h('span', {class:'r-since', text:str(it.since)}) : null,
+          it.why ? h('p', {text:str(it.why)}) : null,
+          it.implication ? h('p', {class:'r-imp', text:'그래서: ' + str(it.implication)}) : null);
+      })));
   }
   function gaugesEl(G){
     var items = arr(G && G.items ? G.items : G);
@@ -535,6 +566,7 @@ dd{margin:0;color:var(--muted);font-size:15px}
       ) : null,
       gaugesEl(iss.gauges),
       lensEl(iss.lens),
+      radarEl(iss.radar),
       h('div', {class:'stack', style:'gap:36px'}, arr(iss.stories).map(function(st, i){ return storyEl(st, i, id); })),
       iss.column ? columnEl(iss.column) : null,
       thinkEl(iss, id),

@@ -172,6 +172,25 @@ dd{margin:0;color:var(--muted);font-size:15px}
 .col-dek{font-family:var(--display);font-size:17px;line-height:1.6;color:var(--muted);border-left:3px solid var(--line);padding-left:12px}
 .col-h{font-size:17px;letter-spacing:0;color:var(--ink);font-family:var(--display);font-weight:700}
 .column p{line-height:1.85}
+
+.view{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;display:flex;flex-direction:column;gap:4px}
+.view-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:600;color:var(--warn);letter-spacing:.04em}
+.hot{color:var(--up);border:1px solid var(--up);border-radius:4px;padding:0 6px;font-size:11px}
+.lens-item{border:1px solid var(--line);background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:10px}
+.lens-belief{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.lens-belief strong{font-family:var(--display);font-size:18px;line-height:1.45;text-decoration:line-through;text-decoration-color:var(--up);text-decoration-thickness:2px}
+.lens-row{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:start}
+.lens-row p{margin:0;min-width:0}
+.lens-k{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;padding-top:4px}
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.gauge{border:1px solid var(--line);background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.g-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.g-name{font-size:13px;font-weight:600;color:var(--muted)}
+.g-verdict{font-size:12px;font-weight:600;border-radius:999px;padding:1px 10px;border:1px solid currentColor}
+.g-verdict.hot{color:var(--up)} .g-verdict.cool{color:var(--down)} .g-verdict.mid{color:var(--muted)}
+.g-val{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:22px;font-variant-numeric:tabular-nums;line-height:1.3}
+.g-basis{font-size:12px;color:var(--muted);line-height:1.5}
+.g-read{margin:0;font-size:15px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -322,6 +341,56 @@ dd{margin:0;color:var(--muted);font-size:15px}
     return out.join('\n');
   }
 
+  /* ---------- 시각 · 통념 체크 · 지표 판독 ---------- */
+  function paraEl(p){
+    if (p && typeof p === 'object'){
+      var t = str(p.type);
+      if (t === 'view') return h('div', {class:'view'},
+        h('div', {class:'view-h'}, h('span', {text:'머니레터의 시각'}), p.controversial ? h('span', {class:'hot', text:'논쟁적'}) : null),
+        h('p', {text:str(p.text)}));
+      return h('p', {text:str(p.text)});
+    }
+    return h('p', {text:str(p)});
+  }
+  function lensEl(L){
+    var items = arr(L && L.items);
+    if (!items.length) return null;
+    return h('section', {class:'sect lens'},
+      h('h2', {text:str(L.title) || '통념 체크'}),
+      L.intro ? h('p', {class:'hint', style:'font-size:14px', text:str(L.intro)}) : null,
+      h('div', {class:'stack', style:'gap:14px'}, items.map(function(it){
+        return h('article', {class:'lens-item'},
+          h('div', {class:'lens-belief'}, h('span', {class:'lens-k', text:'통념'}), h('strong', {text:str(it.belief)})),
+          h('div', {class:'lens-row'}, h('span', {class:'lens-k', text:'지금'}), h('p', {text:str(it.reality)})),
+          it.evidence ? h('div', {class:'lens-row'}, h('span', {class:'lens-k', text:'근거'}), h('p', {text:str(it.evidence)})) : null,
+          it.view ? h('div', {class:'view'},
+            h('div', {class:'view-h'}, h('span', {text:'머니레터의 시각'}), it.controversial ? h('span', {class:'hot', text:'논쟁적'}) : null),
+            h('p', {text:str(it.view)})) : null,
+          it.check ? h('div', {class:'lens-row'}, h('span', {class:'lens-k', text:'확인할 것'}), h('p', {text:str(it.check)})) : null
+        );
+      }))
+    );
+  }
+  function gaugesEl(G){
+    var items = arr(G && G.items ? G.items : G);
+    if (!items.length) return null;
+    var tone = {'과열':'hot','고평가':'hot','상승 압력':'hot','냉각':'cool','저평가':'cool','하락 압력':'cool'};
+    return h('section', {class:'sect'},
+      h('h2', {text:(G && G.title) ? str(G.title) : '지표로 읽는 시장'}),
+      h('p', {class:'hint', style:'font-size:14px', text:'용어 뜻보다 지금 숫자가 무엇을 말하는지에 집중합니다.'}),
+      h('div', {class:'gauges'}, items.map(function(g){
+        var v = str(g.verdict);
+        return h('article', {class:'gauge'},
+          h('div', {class:'g-top'},
+            h('span', {class:'g-name', text:str(g.name)}),
+            v ? h('span', {class:'g-verdict ' + (tone[v] || 'mid'), text:v}) : null),
+          h('div', {class:'g-val'}, h('span', {text:str(g.value)}), g.estimate ? h('span', {class:'est', text:'추정'}) : null),
+          g.basis ? h('div', {class:'g-basis', text:str(g.basis)}) : null,
+          h('p', {class:'g-read', text:str(g.reading)}));
+      }))
+    );
+  }
+
   /* ---------- 표 · 칼럼 ---------- */
   function tableEl(t){
     if (!t || !arr(t.columns).length || !arr(t.rows).length) return null;
@@ -349,7 +418,7 @@ dd{margin:0;color:var(--muted);font-size:15px}
       arr(c.sections).map(function(s){
         return h('section', {class:'stack'},
           s.heading ? h('h3', {class:'col-h', text:str(s.heading)}) : null,
-          arr(s.body).map(function(p){ return h('p', {text:str(p)}); }),
+          arr(s.body).map(paraEl),
           s.chart ? chartEl(s.chart) : null,
           s.table ? tableEl(s.table) : null);
       }),
@@ -370,7 +439,7 @@ dd{margin:0;color:var(--muted);font-size:15px}
     return h('article', {class:'story'},
       h('span', {class:'tag'+(st.side?' side':''), text:str(st.tag)}),
       h('h2', {text:str(st.headline)}),
-      h('div', {class:'stack'}, arr(st.body).map(function(p){ return h('p', {text:str(p)}); })),
+      h('div', {class:'stack'}, arr(st.body).map(paraEl)),
       arr(st.facts).length ? h('div', {class:'facts'}, arr(st.facts).map(function(f){
         return h('div', null, h('span', {class:'fl', text:str(f.label)}), h('span', {class:'fv', text:str(f.value)}), f.note ? h('span', {class:'fn', text:str(f.note)}) : null);
       })) : null,
@@ -464,6 +533,8 @@ dd{margin:0;color:var(--muted);font-size:15px}
         }))),
         h('span', {class:'hint', text:(iss.marketsNote ? str(iss.marketsNote)+' ' : '')+'빨강은 상승, 파랑은 하락입니다.'})
       ) : null,
+      gaugesEl(iss.gauges),
+      lensEl(iss.lens),
       h('div', {class:'stack', style:'gap:36px'}, arr(iss.stories).map(function(st, i){ return storyEl(st, i, id); })),
       iss.column ? columnEl(iss.column) : null,
       thinkEl(iss, id),
